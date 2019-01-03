@@ -1,0 +1,27 @@
+[Unit]
+Description=Jaeger Collector daemon
+Documentation=https://github.com/jaegertracing/jaeger
+Requires=cassandra.service
+Wants=network-online.target
+After=cassandra.service
+AssertFileIsExecutable=/usr/local/bin/jaeger-collector
+
+[Service]
+Environment="SPAN_STORAGE=cassandra"
+ExecStart=/usr/local/bin/jaeger-collector --config-file=/etc/jaeger/config.toml --log-level=debug
+User=jaeger-collector
+Group=jaeger-collector
+NonBlocking=true
+StandardOutput=journal
+StandardError=inherit
+SuccessExitStatus=0
+NoNewPrivileges=true
+
+# Let systemd restart this service only if it has ended with the clean exit code or signal.
+#Restart=on-success
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

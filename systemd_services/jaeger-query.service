@@ -1,0 +1,29 @@
+[Unit]
+Description=Jaeger Query User Interface
+Documentation=https://github.com/jaegertracing/jaeger-ui
+Requires=cassandra.service
+Wants=network-online.target
+After=cassandra.service
+AssertFileIsExecutable=/usr/local/bin/jaeger-query
+
+[Service]
+Environment="SPAN_STORAGE=cassandra"
+ExecStart=/usr/local/bin/jaeger-query --config-file=/etc/jaeger/config.toml --log-level=debug
+User=jaeger-query
+Group=jaeger-query
+PermissionsStartOnly=true
+NonBlocking=true
+StandardOutput=journal
+StandardError=inherit
+SuccessExitStatus=0
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+
+# Let systemd restart this service only if it has ended with the clean exit code or signal.
+#Restart=on-success
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
